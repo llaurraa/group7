@@ -72,16 +72,44 @@ npm run preview
 
 ## GitHub Pages 部署
 
-1. 確保所有更改已提交到 Git
-2. 推送到 GitHub:
+本專案已配置 GitHub Actions 自動部署，推送到 main 分支後會自動建置和部署。
+
+### 首次部署設定
+
+1. **在 GitHub 設定 API Key（重要）**
+
+   到 GitHub repository → Settings → Secrets and variables → Actions → New repository secret
+   - Name: `GEMINI_API_KEY`
+   - Secret: 你的 Gemini API Key
+
+2. **啟用 GitHub Pages**
+
+   到 GitHub repository → Settings → Pages
+   - Source: 選擇 "GitHub Actions"
+
+3. **推送代碼**
    ```bash
    git add .
-   git commit -m "Ready for deployment"
+   git commit -m "Configure GitHub Pages deployment"
    git push origin main
    ```
 
-3. 在 GitHub repository 設定中啟用 GitHub Pages
-4. 選擇部署來源（建議使用 GitHub Actions）
+4. **查看部署狀態**
+
+   到 GitHub repository → Actions 標籤查看部署進度
+
+   部署成功後，網站將在 `https://yourusername.github.io/group7/` 上線
+
+### 手動部署（可選）
+
+如果你想手動部署而不使用 GitHub Actions：
+
+```bash
+npm install
+npm run deploy
+```
+
+這將建置專案並推送到 `gh-pages` 分支。
 
 ## 專案結構
 

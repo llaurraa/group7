@@ -1,84 +1,413 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Neon Alchemy Lab</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;600&display=swap"
-      rel="stylesheet"
-    />
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              display: ["Orbitron", "sans-serif"],
-              body: ["Rajdhani", "sans-serif"],
-            },
-            colors: {
-              neon: {
-                blue: "#00f3ff",
-                green: "#0aff00",
-                purple: "#bd00ff",
-                red: "#ff0055",
-              },
-              lab: {
-                dark: "#050b14",
-                panel: "#0f172a",
-                border: "#1e293b",
-              },
-            },
-            animation: {
-              "pulse-fast": "pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-              glow: "glow 2s ease-in-out infinite alternate",
-              "spin-slow": "spin 12s linear infinite",
-            },
-            keyframes: {
-              glow: {
-                "0%": { boxShadow: "0 0 5px #00f3ff, 0 0 10px #00f3ff" },
-                "100%": { boxShadow: "0 0 20px #00f3ff, 0 0 30px #00f3ff" },
-              },
-            },
-          },
-        },
-      };
-    </script>
-    <style>
-      body {
-        background-color: #050b14;
-        color: #e2e8f0;
-        overflow: hidden;
-      }
-      /* Custom Scrollbar for Lab Feel */
-      ::-webkit-scrollbar {
-        width: 6px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #0f172a;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #1e293b;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #00f3ff;
-      }
-    </style>
-    <script type="importmap">
-      {
-        "imports": {
-          "react": "https://esm.sh/react@^19.2.1",
-          "react-dom/": "https://esm.sh/react-dom@^19.2.1/",
-          "react/": "https://esm.sh/react@^19.2.1/",
-          "lucide-react": "https://esm.sh/lucide-react@^0.559.0",
-          "@google/genai": "https://esm.sh/@google/genai@^1.33.0"
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>霓虹煉金實驗室</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #050b14 0%, #0a1628 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #1e293b;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      background: #00f3ff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 20px;
+      color: #000;
+      box-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+    }
+
+    h1 {
+      font-size: 24px;
+      letter-spacing: 2px;
+      font-weight: 700;
+    }
+
+    .highlight { color: #00f3ff; }
+
+    main {
+      flex: 1;
+      padding: 32px;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .panel {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(5px);
+    }
+
+    .panel h2 {
+      color: #00f3ff;
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+
+    .reactor {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .slots {
+      display: flex;
+      gap: 16px;
+    }
+
+    .slot {
+      width: 100px;
+      height: 100px;
+      border: 3px dashed #475569;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      font-weight: bold;
+      color: #64748b;
+      transition: all 0.3s;
+      background: rgba(30, 41, 59, 0.3);
+    }
+
+    .slot.filled {
+      border-color: #00f3ff;
+      border-style: solid;
+      color: #00f3ff;
+      background: rgba(0, 243, 255, 0.1);
+      box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+    }
+
+    .message {
+      text-align: center;
+      font-size: 16px;
+      color: #0aff00;
+      min-height: 24px;
+      font-weight: 500;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 16px;
+    }
+
+    button {
+      padding: 14px 32px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #00f3ff 0%, #0aff00 100%);
+      color: #000;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 243, 255, 0.4);
+    }
+
+    .btn-secondary {
+      background: #475569;
+      color: #fff;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #64748b;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .elements {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+    }
+
+    .element {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid #475569;
+      border-radius: 10px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .element:hover {
+      border-color: #00f3ff;
+      background: rgba(51, 65, 85, 0.8);
+      transform: translateY(-4px);
+      box-shadow: 0 4px 20px rgba(0, 243, 255, 0.2);
+    }
+
+    .element-symbol {
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .element-name {
+      font-size: 16px;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .element-desc {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .common { color: #94a3b8; }
+    .uncommon { color: #0aff00; }
+    .rare { color: #00f3ff; }
+    .epic { color: #bd00ff; }
+
+    footer {
+      background: rgba(15, 23, 42, 0.8);
+      border-top: 1px solid #1e293b;
+      padding: 16px 24px;
+      display: flex;
+      gap: 32px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .stat { display: flex; align-items: center; gap: 8px; }
+    .stat-value { color: #00f3ff; font-size: 18px; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .processing { animation: pulse 1.5s infinite; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">N</div>
+    <h1>NEON<span class="highlight">ALCHEMY</span></h1>
+  </header>
+
+  <main>
+    <div class="panel">
+      <h2>⚗️ 反應熔爐</h2>
+      <div class="reactor">
+        <div class="slots" id="slots">
+          <div class="slot" data-index="0">?</div>
+          <div class="slot" data-index="1">?</div>
+          <div class="slot" data-index="2">?</div>
+        </div>
+        <div class="message" id="message">歡迎來到霓虹煉金實驗室！選擇元素開始反應</div>
+        <div class="buttons">
+          <button class="btn-primary" id="reactBtn">🔥 啟動反應</button>
+          <button class="btn-secondary" id="clearBtn">清空</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>📦 元素庫存</h2>
+      <div class="elements" id="inventory"></div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="stat">⚡ 能量: <span class="stat-value" id="energy">100</span></div>
+    <div class="stat">💡 洞察: <span class="stat-value" id="insight">50</span></div>
+    <div class="stat">✨ 創造: <span class="stat-value" id="creativity">20</span></div>
+  </footer>
+
+  <script>
+    // 遊戲狀態
+    const state = {
+      inventory: [
+        { id: 'h', name: '氫', symbol: 'H', desc: '宇宙中最輕的元素', rarity: 'common' },
+        { id: 'c', name: '碳', symbol: 'C', desc: '生命的基礎元素', rarity: 'common' },
+        { id: 'o', name: '氧', symbol: 'O', desc: '維持生命的必需元素', rarity: 'common' },
+        { id: 'fe', name: '鐵', symbol: 'Fe', desc: '堅固的金屬元素', rarity: 'uncommon' }
+      ],
+      slots: [null, null, null],
+      energy: 100,
+      insight: 50,
+      creativity: 20,
+      processing: false
+    };
+
+    const recipes = {
+      'h+o': { name: '水', symbol: 'H₂O', desc: '生命之源', rarity: 'common' },
+      'c+o': { name: '二氧化碳', symbol: 'CO₂', desc: '植物呼吸必需品', rarity: 'common' },
+      'h+c': { name: '甲烷', symbol: 'CH₄', desc: '極度易燃', rarity: 'uncommon' },
+      'c+fe': { name: '鋼鐵', symbol: 'Steel', desc: '工業骨架', rarity: 'uncommon' },
+      'fe+o': { name: '氧化鐵', symbol: 'Fe₂O₃', desc: '鐵鏽', rarity: 'common' },
+      'h+h': { name: '純氫氣', symbol: 'H₂', desc: '高度不穩定', rarity: 'common' }
+    };
+
+    // 渲染庫存
+    function renderInventory() {
+      const container = document.getElementById('inventory');
+      container.innerHTML = state.inventory.map(elem => `
+        <div class="element" onclick="selectElement('${elem.id}')">
+          <div class="element-symbol ${elem.rarity}">${elem.symbol}</div>
+          <div class="element-name">${elem.name}</div>
+          <div class="element-desc">${elem.desc}</div>
+        </div>
+      `).join('');
+    }
+
+    // 更新插槽顯示
+    function updateSlots() {
+      state.slots.forEach((elem, i) => {
+        const slot = document.querySelector(`[data-index="${i}"]`);
+        if (elem) {
+          slot.textContent = elem.symbol;
+          slot.classList.add('filled');
+        } else {
+          slot.textContent = '?';
+          slot.classList.remove('filled');
         }
+      });
+    }
+
+    // 更新資源顯示
+    function updateResources() {
+      document.getElementById('energy').textContent = state.energy;
+      document.getElementById('insight').textContent = state.insight;
+      document.getElementById('creativity').textContent = state.creativity;
+    }
+
+    // 顯示消息
+    function showMessage(msg) {
+      document.getElementById('message').textContent = msg;
+    }
+
+    // 選擇元素
+    function selectElement(id) {
+      if (state.processing) return;
+
+      const emptyIndex = state.slots.findIndex(s => s === null);
+      if (emptyIndex === -1) {
+        showMessage('熔爐已滿！請先清空或啟動反應');
+        return;
       }
-    </script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
-  </body>
+
+      const element = state.inventory.find(e => e.id === id);
+      state.slots[emptyIndex] = element;
+      updateSlots();
+      showMessage(`已投入：${element.name} (${element.symbol})`);
+    }
+
+    // 清空
+    function clearSlots() {
+      if (state.processing) return;
+      state.slots = [null, null, null];
+      updateSlots();
+      showMessage('熔爐已清空');
+    }
+
+    // 反應
+    function react() {
+      const filled = state.slots.filter(s => s !== null);
+      if (filled.length < 2) {
+        showMessage('至少需要2個元素才能反應！');
+        return;
+      }
+
+      if (state.energy < 10) {
+        showMessage('能量不足！需要 10 能量');
+        return;
+      }
+
+      state.processing = true;
+      document.querySelectorAll('.slot').forEach(s => s.classList.add('processing'));
+      document.getElementById('reactBtn').disabled = true;
+      document.getElementById('clearBtn').disabled = true;
+      showMessage('正在引導元素魔力...');
+
+      setTimeout(() => {
+        const key = filled.map(e => e.id).sort().join('+');
+        const recipe = recipes[key];
+        const success = Math.random() < 0.85;
+
+        if (success && recipe) {
+          const newElem = {
+            id: recipe.symbol.toLowerCase(),
+            name: recipe.name,
+            symbol: recipe.symbol,
+            desc: recipe.desc,
+            rarity: recipe.rarity
+          };
+
+          if (!state.inventory.find(e => e.id === newElem.id)) {
+            state.inventory.push(newElem);
+            renderInventory();
+          }
+
+          state.energy -= 10;
+          state.insight += 15;
+          state.creativity += (recipe.rarity === 'uncommon' ? 10 : 5);
+          showMessage(`✨ 反應成功！獲得了「${recipe.name}」`);
+        } else {
+          state.energy -= 10;
+          state.insight += 2;
+          showMessage('💥 反應失敗！分子結構崩解了...');
+        }
+
+        state.slots = [null, null, null];
+        state.processing = false;
+        document.querySelectorAll('.slot').forEach(s => s.classList.remove('processing'));
+        document.getElementById('reactBtn').disabled = false;
+        document.getElementById('clearBtn').disabled = false;
+        updateSlots();
+        updateResources();
+      }, 2000);
+    }
+
+    // 事件監聽
+    document.getElementById('reactBtn').addEventListener('click', react);
+    document.getElementById('clearBtn').addEventListener('click', clearSlots);
+
+    // 初始化
+    renderInventory();
+    updateSlots();
+    updateResources();
+  </script>
+</body>
 </html>

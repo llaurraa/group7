@@ -1,152 +1,57 @@
 # 霓虹煉金實驗室 (Neon Alchemy Lab)
 
-一個使用 React + TypeScript + Vite 開發的互動式煉金實驗室遊戲，整合 Google Gemini AI 提供智能提示。
+一個使用 Google Gemini AI 的互動式霓虹風格實驗室應用程式。
 
-## 功能特色
+## 功能特點
 
-- 🧪 互動式元素合成系統
-- 🤖 AI 智能提示功能
-- 🎨 賽博龐克霓虹風格介面
-- 📊 即時狀態追蹤
-- 💾 自動保存進度
-
-## 技術棧
-
-- **框架**: React 19.2.1
-- **語言**: TypeScript 5.8
-- **建置工具**: Vite 6.2
-- **AI 整合**: Google Gemini API
-- **UI**: Tailwind CSS + Lucide Icons
+- 🎨 霓虹賽博朋克風格介面
+- 🤖 整合 Google Gemini AI API
+- ⚛️ 使用 React 19 和 TypeScript
+- ⚡ Vite 快速開發環境
 
 ## 本地運行
 
-### 前置要求
+**前置需求:** Node.js (建議 18.x 或更高版本)
 
-- Node.js (建議 v18 或更高版本)
-- npm 或 yarn
-
-### 安裝步驟
-
-1. **克隆專案**
-   ```bash
-   git clone <your-repo-url>
-   cd group7
-   ```
-
-2. **安裝依賴**
+1. 安裝依賴：
    ```bash
    npm install
    ```
 
-3. **設定環境變數**
+2. 設定環境變數：
+   - 複製 `.env.example` 為 `.env.local`
+   - 在 `.env.local` 中設定你的 Gemini API 金鑰
+   - 從這裡取得 API 金鑰：https://aistudio.google.com/app/apikey
 
-   編輯 `.env.local` 文件，填入你的 Gemini API Key：
-   ```
-   GEMINI_API_KEY=your_api_key_here
-   ```
-
-   獲取 API Key: [https://aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
-
-4. **啟動開發伺服器**
+3. 啟動開發伺服器：
    ```bash
    npm run dev
    ```
 
-   應用程式將在 `http://localhost:3000` 運行
+4. 在瀏覽器中打開顯示的本地網址（通常是 `http://localhost:5173`）
 
 ## 建置部署
 
-### 建置生產版本
-
+建置生產版本：
 ```bash
 npm run build
 ```
 
-建置後的文件會在 `dist` 目錄中。
-
-### 預覽生產版本
-
+預覽生產版本：
 ```bash
 npm run preview
 ```
 
-## GitHub Pages 部署
+## 技術棧
 
-本專案已配置 GitHub Actions 自動部署，推送到 main 分支後會自動建置和部署。
-
-### 首次部署設定
-
-1. **在 GitHub 設定 API Key（重要）**
-
-   到 GitHub repository → Settings → Secrets and variables → Actions → New repository secret
-   - Name: `GEMINI_API_KEY`
-   - Secret: 你的 Gemini API Key
-
-2. **啟用 GitHub Pages**
-
-   到 GitHub repository → Settings → Pages
-   - Source: 選擇 "GitHub Actions"
-
-3. **推送代碼**
-   ```bash
-   git add .
-   git commit -m "Configure GitHub Pages deployment"
-   git push origin main
-   ```
-
-4. **查看部署狀態**
-
-   到 GitHub repository → Actions 標籤查看部署進度
-
-   部署成功後，網站將在 `https://yourusername.github.io/group7/` 上線
-
-### 手動部署（可選）
-
-如果你想手動部署而不使用 GitHub Actions：
-
-```bash
-npm install
-npm run deploy
-```
-
-這將建置專案並推送到 `gh-pages` 分支。
-
-## 專案結構
-
-```
-group7/
-├── components/          # React 組件
-│   ├── InventoryPanel.tsx
-│   ├── KnowledgePanel.tsx
-│   ├── ReactorPanel.tsx
-│   ├── RulesModal.tsx
-│   └── StatusPanel.tsx
-├── services/           # 服務層
-│   └── geminiService.ts
-├── App.tsx            # 主應用組件
-├── constants.tsx      # 常數定義
-├── types.ts          # TypeScript 類型定義
-├── index.tsx         # 應用入口
-├── index.html        # HTML 模板
-├── vite.config.ts    # Vite 配置
-└── package.json      # 專案配置
-
-```
-
-## 開發說明
-
-- 使用 TypeScript 進行類型安全的開發
-- 組件採用函數式組件和 React Hooks
-- 狀態管理使用 React 內建的 useState 和 useEffect
-- AI 功能整合 Google Gemini API
+- React 19
+- TypeScript
+- Vite
+- Tailwind CSS
+- Google Gemini AI
+- Lucide React (圖標庫)
 
 ## 注意事項
 
-⚠️ **重要**:
-- 不要將 `.env.local` 文件提交到 Git（已在 .gitignore 中排除）
-- 確保 API Key 安全，不要公開分享
-- 建議在生產環境使用環境變數管理 API Key
-
-## 授權
-
-本專案僅供學習和研究使用。
+- 請勿將 `.env.local` 檔案提交到 Git 倉庫
+- API 金鑰應保密，不要分享給他人

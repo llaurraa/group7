@@ -1,8 +1,26 @@
 
-import { GoogleGenAI, Type } from "@google/genai";
-import { ChemicalElement, ReactionResult, Catalyst, Accessory, VisualEffectType } from '../types';
+import { ChemicalElement, ReactionResult, Catalyst, Accessory, VisualEffectType, Rarity } from '../types';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+/**
+ * 本地配方表 - 確保核心化學反應的準確性
+ */
+const RECIPE_BOOK: Record<string, { 
+  name: string, 
+  symbol: string, 
+  type: 'basic' | 'compound' | 'rare', 
+  rarity: Rarity, 
+  effect: VisualEffectType, 
+  desc: string 
+}> = {
+  'h+o': { name: '水', symbol: 'H2O', type: 'compound', rarity: 'common', effect: 'water', desc: '生命之源，最完美的溶劑。' },
+  'c+o': { name: '二氧化碳', symbol: 'CO2', type: 'compound', rarity: 'common', effect: 'gas', desc: '植物呼吸的必需品。' },
+  'h+c': { name: '甲烷', symbol: 'CH4', type: 'compound', rarity: 'uncommon', effect: 'fire', desc: '簡單的碳氫化合物，極度易燃。' },
+  'c+fe': { name: '鋼鐵', symbol: 'Steel', type: 'compound', rarity: 'uncommon', effect: 'metal', desc: '經過碳強化的鐵，工業的骨架。' },
+  'fe+o': { name: '氧化鐵', symbol: 'Fe2O3', type: 'compound', rarity: 'common', effect: 'default', desc: '俗稱鐵鏽，氧化的金屬產物。' },
+  'h+h': { name: '純氫氣', symbol: 'H2', type: 'basic', rarity: 'common', effect: 'gas', desc: '高度不穩定的雙原子分子。' },
+  'o+o': { name: '臭氧', symbol: 'O3', type: 'rare', rarity: 'rare', effect: 'magic', desc: '罕見的氧同素異形體，具有強氧化性。' },
+  'c+c': { name: '石墨', symbol: 'Graphite', type: 'basic', rarity: 'uncommon', effect: 'default', desc: '純碳結構，導電且質軟。' }
+};
 
 export const simulateReaction = async (
   inputs: ChemicalElement[],
@@ -10,6 +28,7 @@ export const simulateReaction = async (
   currentInsight: number = 0,
   accessory: Accessory | null = null
 ): Promise<ReactionResult> => {
+  // 基礎驗證
   if (inputs.length < 2) {
     return {
       success: false,
@@ -21,114 +40,83 @@ export const simulateReaction = async (
     };
   }
 
-  const inputNames = inputs.map(i => i.name).join(' + ');
-  const catalystInfo = catalyst ? `Catalyst Used: ${catalyst.name}. Effect: ${catalyst.effectDescription}` : "No catalyst used.";
-  const accessoryInfo = accessory ? `Furnace Accessory Equipped: ${accessory.name}. Effect: ${accessory.effectDescription}` : "No accessory equipped.";
+  // 排序輸入元素 ID 以便查詢配方
+  const recipeKey = inputs.map(i => i.id).sort().join('+');
+  const recipe = RECIPE_BOOK[recipeKey];
 
-  const systemInstruction = `
-    You are the 'Neon Alchemy Engine', a high-tech chemistry simulator.
-    Determine the result of combining elements/compounds.
-    
-    Inputs: ${inputNames}
-    ${catalystInfo}
-    ${accessoryInfo}
-    Player Insight Level: ${currentInsight}
+  // 計算成功率基礎 (如果有組件或催化劑會提升)
+  let successChance = 0.85; // 基礎 85%
+  if (catalyst?.id === 'stabilizer') successChance += 0.15;
+  if (accessory?.id === 'core_stabilizer') successChance += 0.1;
 
-    IMPORTANT RULES:
-    1. **STRICT SCIENTIFIC REALISM**: The result MUST be a REAL substance.
-    2. **Accessory/Catalyst Logic**: Apply their effects to success rate and rarity.
-    3. **Visual Effect Classification**:
-       - 'fire': Explosives, fuels, high heat reactions, magma.
-       - 'water': Liquids, coolants, oceans, ice, solutions.
-       - 'electric': Batteries, conductors, magnets, energy sources.
-       - 'bio': Organic matter, life forms, DNA, plants, toxins.
-       - 'magic': (Rare/Epic only) Exotic particles, unstable isotopes, mysterious compounds.
-       - 'metal': Pure metals, heavy alloys, crystals.
-       - 'gas': Vapors, clouds, noble gases.
-       - 'default': Dust, ash, stone, common materials.
+  const isSuccess = Math.random() < successChance;
 
-    4. **Output**: Return all text fields in Traditional Chinese (繁體中文).
-  `;
+  if (isSuccess && recipe) {
+    // 發現配方中的物質
+    const product: ChemicalElement = {
+      id: recipe.symbol.toLowerCase().replace(/\s/g, '_'),
+      name: recipe.name,
+      symbol: recipe.symbol,
+      atomicNumber: inputs.reduce((acc, curr) => acc + curr.atomicNumber, 0),
+      type: recipe.type,
+      rarity: recipe.rarity,
+      description: recipe.desc,
+      discovered: true
+    };
 
-  try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: `Simulate this reaction: ${inputNames}. Catalyst: ${catalyst ? catalyst.name : 'None'}`,
-      config: {
-        systemInstruction: systemInstruction,
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            success: { type: Type.BOOLEAN },
-            productName: { type: Type.STRING },
-            productSymbol: { type: Type.STRING },
-            productDescription: { type: Type.STRING },
-            productType: { type: Type.STRING, enum: ["basic", "compound", "rare"] },
-            rarity: { type: Type.STRING, enum: ["common", "uncommon", "rare", "epic", "legendary"] },
-            message: { type: Type.STRING },
-            insightValue: { type: Type.INTEGER },
-            visualColor: { type: Type.STRING },
-            visualEffect: { type: Type.STRING, enum: ['fire', 'water', 'electric', 'bio', 'magic', 'metal', 'gas', 'default'] }
-          },
-          required: ["success", "message", "insightValue", "visualColor", "rarity", "visualEffect"]
-        }
-      }
-    });
+    // 根據稀有度計算獎勵
+    let bonusCreativity = 5;
+    if (recipe.rarity === 'rare') bonusCreativity = 20;
+    if (recipe.rarity === 'epic') bonusCreativity = 40;
 
-    const result = JSON.parse(response.text || "{}");
+    return {
+      success: true,
+      product,
+      message: `反應成功！獲得了「${recipe.name}」。`,
+      insightGained: 15,
+      creativityGained: bonusCreativity,
+      energyCost: 10,
+      visualColor: recipe.rarity === 'rare' ? '#00f3ff' : recipe.rarity === 'uncommon' ? '#0aff00' : '#94a3b8',
+      visualEffect: recipe.effect,
+      isNewDiscovery: true,
+      rarity: recipe.rarity
+    };
+  } else if (isSuccess) {
+    // 生成隨機「不穩定物質」 (當沒有對應配方時)
+    const fallbackId = `iso_${inputs.map(i => i.symbol).join('')}`;
+    const product: ChemicalElement = {
+      id: fallbackId,
+      name: '不穩定同位素',
+      symbol: 'Un?',
+      atomicNumber: inputs.reduce((acc, curr) => acc + curr.atomicNumber, 0),
+      type: 'compound',
+      rarity: 'common',
+      description: '一種由多種元素強行聚合而成的臨時物質，結構極其不穩。',
+      discovered: true
+    };
 
-    if (result.success && result.productName) {
-      const newProduct: ChemicalElement = {
-        id: result.productName.toLowerCase().replace(/\s/g, '_'),
-        name: result.productName,
-        symbol: result.productSymbol || '?',
-        atomicNumber: Math.floor(Math.random() * 100) + 1,
-        type: result.productType || 'compound',
-        rarity: result.rarity || 'common',
-        description: result.productDescription || '未知物質',
-        discovered: true
-      };
-
-      // Bonus calculations
-      let bonusCreativity = 5;
-      if (result.rarity === 'rare') bonusCreativity = 15;
-      if (result.rarity === 'epic') bonusCreativity = 30;
-      if (result.rarity === 'legendary') bonusCreativity = 60;
-
-      return {
-        success: true,
-        product: newProduct,
-        message: result.message,
-        insightGained: result.insightValue || 10,
-        creativityGained: bonusCreativity,
-        energyCost: 10,
-        visualColor: result.visualColor || '#ffffff',
-        visualEffect: result.visualEffect || 'default',
-        isNewDiscovery: true,
-        rarity: result.rarity
-      };
-    } else {
-      return {
-        success: false,
-        message: result.message || "反應失敗。無法形成穩定的化學結構。",
-        insightGained: 2,
-        creativityGained: 0,
-        energyCost: 10,
-        visualColor: '#333333',
-        visualEffect: 'default',
-        isNewDiscovery: false
-      };
-    }
-
-  } catch (error) {
-    console.error("Gemini Simulation Error:", error);
+    return {
+      success: true,
+      product,
+      message: "反應產生了意料之外的不穩定聚合物。",
+      insightGained: 5,
+      creativityGained: 2,
+      energyCost: 10,
+      visualColor: '#64748b',
+      visualEffect: 'default',
+      isNewDiscovery: true,
+      rarity: 'common'
+    };
+  } else {
+    // 反應失敗
     return {
       success: false,
-      message: "模擬錯誤：反應堆 AI 離線。",
-      insightGained: 0,
+      message: "分子結構崩解，未能形成穩定的產物。",
+      insightGained: 2,
       creativityGained: 0,
-      energyCost: 0,
+      energyCost: 10,
+      visualColor: '#334155',
+      visualEffect: 'default',
       isNewDiscovery: false
     };
   }

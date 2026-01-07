@@ -46,9 +46,9 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
               <Target className="w-5 h-5" /> 任務目標 (MISSION OBJECTIVE)
             </h3>
             <p className="leading-relaxed border-l-2 border-slate-700 pl-4">
-              您是<strong className="text-white">「霓虹煉金引擎」</strong>的操作員。
-              您的目標是透過<strong className="text-neon-blue">「魔法熔爐」</strong>組合基本物質，熔煉出未知的元素。
-              解開宇宙的奧秘，完成知識矩陣的登錄。
+              您是<strong className="text-white">「霓虹煉金實驗室」</strong>的操作員。
+              您的目標是透過內建的<strong className="text-neon-blue">「量子模擬引擎」</strong>組合基本物質，熔煉出未知的元素。
+              遵循化學規律或利用催化劑打破常規，完成知識矩陣的登錄。
             </p>
           </section>
 
@@ -64,11 +64,11 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
               </div>
               <div className="bg-slate-900/50 p-4 rounded border border-slate-700">
                 <div className="text-neon-purple font-display text-xl mb-2">02. 熔煉</div>
-                <p className="text-sm">當素材就緒時，按下中央的<strong>「啟動熔煉」</strong>按鈕開始合成。每次運作消耗 <strong className="text-neon-blue">10 能量</strong>。</p>
+                <p className="text-sm">當素材就緒時，按下中央的<strong>「啟動熔煉」</strong>按鈕。引擎將根據配方庫進行即時模擬。每次運作消耗 <strong className="text-neon-blue">10 能量</strong>。</p>
               </div>
               <div className="bg-slate-900/50 p-4 rounded border border-slate-700">
                 <div className="text-neon-purple font-display text-xl mb-2">03. 發現</div>
-                <p className="text-sm">觀察熔爐變化。成功的轉化將創造新元素並完成委託，賺取更多能量。</p>
+                <p className="text-sm">觀察熔爐變化。成功的轉化將創造新元素並完成委託，解鎖隱藏的物質配方。</p>
               </div>
             </div>
           </section>
@@ -85,7 +85,7 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
                 </div>
                 <div>
                   <strong className="text-white block font-display text-sm">洞察力 (INSIGHT)</strong>
-                  <span className="text-sm text-slate-400">實驗累積的知識。當洞察力達到 <strong className="text-neon-blue">100</strong> 時，將解鎖合成高稀有度物質的能力。</span>
+                  <span className="text-sm text-slate-400">實驗累積的知識數據。這代表了您對量子化學規律的掌握程度。</span>
                 </div>
               </li>
               <li className="flex items-start gap-3">
@@ -94,7 +94,7 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
                 </div>
                 <div>
                   <strong className="text-white block font-display text-sm">能量 (ENERGY)</strong>
-                  <span className="text-sm text-slate-400">驅動熔爐的魔力燃料。每次熔煉消耗 10 點。完成委託可回復 20 點。</span>
+                  <span className="text-sm text-slate-400">驅動熔爐運作的魔力燃料。每次熔煉消耗 10 點。完成委託可回復 20 點。</span>
                 </div>
               </li>
               <li className="flex items-start gap-3">
@@ -103,7 +103,7 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
                 </div>
                 <div>
                   <strong className="text-white block font-display text-sm">創造力 (CREATIVITY)</strong>
-                  <span className="text-sm text-slate-400">額外的獎勵資源，可用於商店購買能量電池或催化劑。</span>
+                  <span className="text-sm text-slate-400">額外的獎勵資源，可用於商店購買能量電池或量子催化劑。</span>
                 </div>
               </li>
             </ul>
@@ -111,7 +111,7 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
 
            <div className="pt-4 border-t border-slate-800 text-center">
               <p className="text-xs font-mono text-slate-500">
-                警告：未經授權的元素組合可能導致熔爐魔力不穩定。
+                系統警告：量子配方引擎已完全離線，目前由本地備用邏輯運行。
               </p>
            </div>
         </div>

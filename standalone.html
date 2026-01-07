@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>霓虹煉金實驗室 - Neon Alchemy Lab</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@18.2.0",
+      "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+      "lucide-react": "https://esm.sh/lucide-react@0.263.1"
+    }
+  }
+  </script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            'display': ['Orbitron', 'sans-serif'],
+            'body': ['Rajdhani', 'sans-serif'],
+          },
+          colors: {
+            neon: {
+              blue: '#00f3ff',
+              green: '#0aff00',
+              purple: '#bd00ff',
+              red: '#ff0055',
+            },
+            lab: {
+              dark: '#050b14',
+              panel: '#0f172a',
+              border: '#1e293b'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #050b14;
+      color: #e2e8f0;
+      overflow: hidden;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00f3ff;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="module">
+    import React from 'react';
+    import ReactDOM from 'react-dom/client';
+    import { BookOpen, Zap, Flame, Droplet, Sparkles } from 'lucide-react';
+
+    const { useState, useEffect } = React;
+
+    // 常數定義
+    const INITIAL_ELEMENTS = [
+      { id: 'h', name: '氫', symbol: 'H', description: '宇宙中最輕的元素', atomicNumber: 1, type: 'basic', rarity: 'common', discovered: true },
+      { id: 'c', name: '碳', symbol: 'C', description: '生命的基礎元素', atomicNumber: 6, type: 'basic', rarity: 'common', discovered: true },
+      { id: 'o', name: '氧', symbol: 'O', description: '維持生命的必需元素', atomicNumber: 8, type: 'basic', rarity: 'common', discovered: true },
+      { id: 'fe', name: '鐵', symbol: 'Fe', description: '堅固的金屬元素', atomicNumber: 26, type: 'basic', rarity: 'uncommon', discovered: true }
+    ];
+
+    const RECIPE_BOOK = {
+      'h+o': { name: '水', symbol: 'H2O', type: 'compound', rarity: 'common', effect: 'water', desc: '生命之源，最完美的溶劑。' },
+      'c+o': { name: '二氧化碳', symbol: 'CO2', type: 'compound', rarity: 'common', effect: 'gas', desc: '植物呼吸的必需品。' },
+      'h+c': { name: '甲烷', symbol: 'CH4', type: 'compound', rarity: 'uncommon', effect: 'fire', desc: '簡單的碳氫化合物，極度易燃。' },
+      'c+fe': { name: '鋼鐵', symbol: 'Steel', type: 'compound', rarity: 'uncommon', effect: 'metal', desc: '經過碳強化的鐵，工業的骨架。' },
+      'fe+o': { name: '氧化鐵', symbol: 'Fe2O3', type: 'compound', rarity: 'common', effect: 'default', desc: '俗稱鐵鏽，氧化的金屬產物。' },
+      'h+h': { name: '純氫氣', symbol: 'H2', type: 'basic', rarity: 'common', effect: 'gas', desc: '高度不穩定的雙原子分子。' }
+    };
+
+    const RARITY_COLORS = {
+      common: '#94a3b8',
+      uncommon: '#0aff00',
+      rare: '#00f3ff',
+      epic: '#bd00ff',
+      legendary: '#ff0055'
+    };
+
+    // 反應模擬函數
+    const simulateReaction = async (inputs) => {
+      if (inputs.length < 2) {
+        return {
+          success: false,
+          message: "至少需要兩種元素才能進行反應。",
+          insightGained: 0,
+          creativityGained: 0,
+          energyCost: 0,
+          isNewDiscovery: false,
+        };
+      }
+
+      const recipeKey = inputs.map(i => i.id).sort().join('+');
+      const recipe = RECIPE_BOOK[recipeKey];
+      const isSuccess = Math.random() < 0.85;
+
+      if (isSuccess && recipe) {
+        const product = {
+          id: recipe.symbol.toLowerCase().replace(/\\s/g, '_'),
+          name: recipe.name,
+          symbol: recipe.symbol,
+          atomicNumber: inputs.reduce((acc, curr) => acc + curr.atomicNumber, 0),
+          type: recipe.type,
+          rarity: recipe.rarity,
+          description: recipe.desc,
+          discovered: true
+        };
+
+        return {
+          success: true,
+          product,
+          message: \`反應成功！獲得了「\${recipe.name}」。\`,
+          insightGained: 15,
+          creativityGained: recipe.rarity === 'rare' ? 20 : 5,
+          energyCost: 10,
+          visualColor: RARITY_COLORS[recipe.rarity],
+          visualEffect: recipe.effect,
+          isNewDiscovery: true,
+          rarity: recipe.rarity
+        };
+      } else {
+        return {
+          success: false,
+          message: "分子結構崩解，未能形成穩定的產物。",
+          insightGained: 2,
+          creativityGained: 0,
+          energyCost: 10,
+          visualColor: '#334155',
+          visualEffect: 'default',
+          isNewDiscovery: false
+        };
+      }
+    };
+
+    // 主應用組件
+    function App() {
+      const [gameState, setGameState] = useState({
+        resources: { insight: 50, energy: 100, creativity: 20 },
+        inventory: INITIAL_ELEMENTS,
+        selectedInputs: [],
+        isProcessing: false
+      });
+
+      const [message, setMessage] = useState("歡迎來到霓虹煉金實驗室！");
+      const [reactionColor, setReactionColor] = useState("#00f3ff");
+
+      const handleSelectElement = (element) => {
+        if (gameState.selectedInputs.length < 3 && !gameState.isProcessing) {
+          setGameState(prev => ({
+            ...prev,
+            selectedInputs: [...prev.selectedInputs, element]
+          }));
+          setMessage(\`已投入：\${element.name}\`);
+        } else if (gameState.selectedInputs.length >= 3) {
+          setMessage("熔爐容量已滿。請清空插槽以添加新素材。");
+        }
+      };
+
+      const handleClear = () => {
+        setGameState(prev => ({ ...prev, selectedInputs: [] }));
+        setMessage("熔爐已清空。");
+      };
+
+      const handleReact = async () => {
+        if (gameState.selectedInputs.length < 2) return;
+
+        if (gameState.resources.energy < 10) {
+          setMessage("能量不足 (需要 10)。");
+          return;
+        }
+
+        setGameState(prev => ({ ...prev, isProcessing: true }));
+        setMessage("正在引導元素魔力...");
+
+        const result = await simulateReaction(gameState.selectedInputs);
+
+        if (result.visualColor) {
+          setReactionColor(result.visualColor);
+        }
+
+        setTimeout(() => {
+          setGameState(prev => {
+            let newInventory = [...prev.inventory];
+
+            if (result.success && result.product) {
+              const exists = prev.inventory.some(e => e.id === result.product.id);
+              if (!exists) {
+                newInventory.push(result.product);
+              }
+            }
+
+            return {
+              ...prev,
+              isProcessing: false,
+              resources: {
+                insight: prev.resources.insight + result.insightGained,
+                energy: Math.max(0, prev.resources.energy - 10),
+                creativity: prev.resources.creativity + result.creativityGained
+              },
+              inventory: newInventory,
+              selectedInputs: []
+            };
+          });
+
+          setMessage(result.message);
+        }, 2000);
+      };
+
+      return React.createElement('div', {
+        className: 'flex flex-col h-screen w-full bg-lab-dark text-slate-200 font-body'
+      }, [
+        // Header
+        React.createElement('header', {
+          key: 'header',
+          className: 'h-16 border-b border-lab-border flex items-center px-6 justify-between bg-lab-panel shadow-md'
+        }, [
+          React.createElement('div', { key: 'logo', className: 'flex items-center gap-3' }, [
+            React.createElement('div', {
+              key: 'icon',
+              className: 'w-8 h-8 bg-neon-blue rounded-full flex items-center justify-center',
+              style: { boxShadow: '0 0 15px rgba(0,243,255,0.5)' }
+            }, React.createElement('span', {
+              className: 'font-display font-bold text-black text-xl'
+            }, 'N')),
+            React.createElement('h1', {
+              key: 'title',
+              className: 'font-display text-2xl tracking-widest text-white'
+            }, ['NEON', React.createElement('span', { key: 'accent', className: 'text-neon-blue' }, 'ALCHEMY')])
+          ])
+        ]),
+
+        // Main Content
+        React.createElement('main', {
+          key: 'main',
+          className: 'flex-1 p-8 relative overflow-auto'
+        }, [
+          // Background glow
+          React.createElement('div', {
+            key: 'glow',
+            className: 'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full blur-[120px] pointer-events-none transition-colors duration-1000 opacity-20',
+            style: { backgroundColor: reactionColor }
+          }),
+
+          // Content grid
+          React.createElement('div', {
+            key: 'grid',
+            className: 'relative z-10 max-w-6xl mx-auto'
+          }, [
+            // Reactor Panel
+            React.createElement('div', {
+              key: 'reactor',
+              className: 'bg-lab-panel border border-lab-border rounded-lg p-6 mb-6'
+            }, [
+              React.createElement('h2', {
+                key: 'title',
+                className: 'font-display text-xl mb-4 text-neon-blue'
+              }, '⚗️ 反應熔爐'),
+
+              React.createElement('div', {
+                key: 'slots',
+                className: 'flex gap-4 mb-4 justify-center'
+              }, [0, 1, 2].map(i =>
+                React.createElement('div', {
+                  key: i,
+                  className: 'w-20 h-20 border-2 border-dashed border-slate-600 rounded-lg flex items-center justify-center text-3xl font-display',
+                  style: gameState.selectedInputs[i] ? { borderColor: '#00f3ff', color: '#00f3ff' } : {}
+                }, gameState.selectedInputs[i]?.symbol || '?')
+              )),
+
+              React.createElement('div', {
+                key: 'message',
+                className: 'text-center mb-4 h-6 text-sm',
+                style: { color: reactionColor }
+              }, message),
+
+              React.createElement('div', {
+                key: 'buttons',
+                className: 'flex gap-4 justify-center'
+              }, [
+                React.createElement('button', {
+                  key: 'react',
+                  onClick: handleReact,
+                  disabled: gameState.selectedInputs.length < 2 || gameState.isProcessing,
+                  className: 'px-6 py-2 bg-neon-blue text-black font-display rounded hover:bg-neon-green transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+                }, gameState.isProcessing ? '反應中...' : '🔥 啟動反應'),
+
+                React.createElement('button', {
+                  key: 'clear',
+                  onClick: handleClear,
+                  disabled: gameState.isProcessing,
+                  className: 'px-6 py-2 bg-slate-700 text-white font-display rounded hover:bg-slate-600 transition-colors disabled:opacity-50'
+                }, '清空')
+              ])
+            ]),
+
+            // Inventory Panel
+            React.createElement('div', {
+              key: 'inventory',
+              className: 'bg-lab-panel border border-lab-border rounded-lg p-6'
+            }, [
+              React.createElement('h2', {
+                key: 'title',
+                className: 'font-display text-xl mb-4 text-neon-green'
+              }, '📦 元素庫存'),
+
+              React.createElement('div', {
+                key: 'grid',
+                className: 'grid grid-cols-2 md:grid-cols-4 gap-3'
+              }, gameState.inventory.map(element =>
+                React.createElement('button', {
+                  key: element.id,
+                  onClick: () => handleSelectElement(element),
+                  disabled: gameState.isProcessing,
+                  className: 'p-4 border border-slate-600 rounded-lg hover:border-neon-blue hover:bg-slate-800 transition-all disabled:opacity-50 text-left'
+                }, [
+                  React.createElement('div', {
+                    key: 'symbol',
+                    className: 'text-2xl font-display mb-1',
+                    style: { color: RARITY_COLORS[element.rarity] }
+                  }, element.symbol),
+                  React.createElement('div', {
+                    key: 'name',
+                    className: 'text-sm text-slate-300'
+                  }, element.name),
+                  React.createElement('div', {
+                    key: 'desc',
+                    className: 'text-xs text-slate-500 mt-1'
+                  }, element.description)
+                ])
+              ))
+            ])
+          ])
+        ]),
+
+        // Status Bar
+        React.createElement('footer', {
+          key: 'footer',
+          className: 'h-14 border-t border-lab-border bg-lab-panel px-6 flex items-center justify-between'
+        }, [
+          React.createElement('div', {
+            key: 'resources',
+            className: 'flex gap-6 text-sm font-display'
+          }, [
+            React.createElement('span', { key: 'energy' }, ['⚡ 能量: ', React.createElement('span', { className: 'text-neon-blue' }, gameState.resources.energy)]),
+            React.createElement('span', { key: 'insight' }, ['💡 洞察: ', React.createElement('span', { className: 'text-neon-green' }, gameState.resources.insight)]),
+            React.createElement('span', { key: 'creativity' }, ['✨ 創造: ', React.createElement('span', { className: 'text-neon-purple' }, gameState.resources.creativity)])
+          ])
+        ])
+      ]);
+    }
+
+    // 啟動應用
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(App));
+  </script>
+</body>
+</html>

@@ -5,42 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Neon Alchemy Lab</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
     <script>
       tailwind.config = {
         theme: {
           extend: {
             fontFamily: {
-              'display': ['Orbitron', 'sans-serif'],
-              'body': ['Rajdhani', 'sans-serif'],
+              display: ["Orbitron", "sans-serif"],
+              body: ["Rajdhani", "sans-serif"],
             },
             colors: {
               neon: {
-                blue: '#00f3ff',
-                green: '#0aff00',
-                purple: '#bd00ff',
-                red: '#ff0055',
+                blue: "#00f3ff",
+                green: "#0aff00",
+                purple: "#bd00ff",
+                red: "#ff0055",
               },
               lab: {
-                dark: '#050b14',
-                panel: '#0f172a',
-                border: '#1e293b'
-              }
+                dark: "#050b14",
+                panel: "#0f172a",
+                border: "#1e293b",
+              },
             },
             animation: {
-              'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-              'glow': 'glow 2s ease-in-out infinite alternate',
-              'spin-slow': 'spin 12s linear infinite',
+              "pulse-fast": "pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+              glow: "glow 2s ease-in-out infinite alternate",
+              "spin-slow": "spin 12s linear infinite",
             },
             keyframes: {
               glow: {
-                '0%': { boxShadow: '0 0 5px #00f3ff, 0 0 10px #00f3ff' },
-                '100%': { boxShadow: '0 0 20px #00f3ff, 0 0 30px #00f3ff' },
-              }
-            }
-          }
-        }
-      }
+                "0%": { boxShadow: "0 0 5px #00f3ff, 0 0 10px #00f3ff" },
+                "100%": { boxShadow: "0 0 20px #00f3ff, 0 0 30px #00f3ff" },
+              },
+            },
+          },
+        },
+      };
     </script>
     <style>
       body {
@@ -53,29 +56,29 @@
         width: 6px;
       }
       ::-webkit-scrollbar-track {
-        background: #0f172a; 
+        background: #0f172a;
       }
       ::-webkit-scrollbar-thumb {
-        background: #1e293b; 
+        background: #1e293b;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #00f3ff; 
+        background: #00f3ff;
       }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@^19.2.1",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.1/",
-    "react/": "https://esm.sh/react@^19.2.1/",
-    "lucide-react": "https://esm.sh/lucide-react@^0.559.0",
-    "@google/genai": "https://esm.sh/@google/genai@^1.33.0"
-  }
-}
-</script>
-</head>
+    <script type="importmap">
+      {
+        "imports": {
+          "react": "https://esm.sh/react@^19.2.1",
+          "react-dom/": "https://esm.sh/react-dom@^19.2.1/",
+          "react/": "https://esm.sh/react@^19.2.1/",
+          "lucide-react": "https://esm.sh/lucide-react@^0.559.0",
+          "@google/genai": "https://esm.sh/@google/genai@^1.33.0"
+        }
+      }
+    </script>
+  </head>
   <body>
     <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
-</body>
+    <script type="module" src="/index.tsx"></script>
+  </body>
 </html>
